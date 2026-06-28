@@ -2,6 +2,12 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
 
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 const ROLE_LABELS: Record<string, string> = {
   student: 'Student',
   counselor: 'School Counselor',
@@ -21,11 +27,14 @@ export default function ProfileScreen() {
 
   if (!user) return null;
 
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || '?';
+  const avatarBg = getAvatarBg(fullName);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inner}>
         {/* Avatar */}
-        <View style={styles.avatar}>
+        <View style={[styles.avatar, { backgroundColor: avatarBg }]}>
           <Text style={styles.avatarText}>
             {(user.firstName || '?')[0]}{(user.lastName || '?')[0]}
           </Text>
@@ -64,7 +73,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#F4F7FB',
   },
   inner: {
     flex: 1,
@@ -76,23 +85,22 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#1e40af',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
   },
   avatarText: {
     fontSize: 28,
-    fontWeight: '700',
+    fontFamily: 'Manrope_700Bold',
     color: '#fff',
   },
   name: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#111827',
+    fontFamily: 'Manrope_800ExtraBold',
+    color: '#17233D',
   },
   roleBadge: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E2EEFB',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -101,19 +109,19 @@ const styles = StyleSheet.create({
   },
   roleText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#1e40af',
+    fontFamily: 'PublicSans_600SemiBold',
+    color: '#1E73CE',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 4,
     width: '100%',
-    shadowColor: '#000',
+    shadowColor: '#142850',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowRadius: 2,
+    elevation: 1,
   },
   row: {
     flexDirection: 'row',
@@ -122,31 +130,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: '#F4F7FB',
   },
   rowLabel: {
     fontSize: 14,
-    color: '#6b7280',
+    fontFamily: 'PublicSans_500Medium',
+    color: '#64728A',
   },
   rowValue: {
     fontSize: 14,
-    color: '#111827',
-    fontWeight: '500',
+    fontFamily: 'PublicSans_500Medium',
+    color: '#17233D',
     maxWidth: '60%',
     textAlign: 'right',
   },
   logoutButton: {
     marginTop: 32,
     width: '100%',
-    borderWidth: 1.5,
-    borderColor: '#ef4444',
-    borderRadius: 12,
-    paddingVertical: 14,
+    backgroundColor: '#E5483B',
+    borderRadius: 9,
+    height: 46,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#ef4444',
+    fontFamily: 'Manrope_700Bold',
+    color: '#fff',
   },
 });

@@ -49,7 +49,7 @@ export default function LoginScreen() {
           <TextInput
             style={styles.input}
             placeholder="you@school.edu"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor="#95A2B6"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -61,7 +61,7 @@ export default function LoginScreen() {
           <TextInput
             style={styles.input}
             placeholder="••••••••"
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor="#95A2B6"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -97,7 +97,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#F4F7FB',
   },
   inner: {
     flex: 1,
@@ -110,56 +110,69 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#1e40af',
+    fontFamily: 'Manrope_800ExtraBold',
+    color: '#1E73CE',
     letterSpacing: -0.5,
   },
   tagline: {
     fontSize: 15,
-    color: '#6b7280',
+    fontFamily: 'PublicSans_400Regular',
+    color: '#64728A',
     marginTop: 6,
   },
   form: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E6EBF2',
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 6,
+    fontSize: 13,
+    fontFamily: 'PublicSans_600SemiBold',
+    color: '#36425A',
+    marginBottom: 7,
     marginTop: 12,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#E6EBF2',
+    borderRadius: 9,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#111827',
-    backgroundColor: '#f9fafb',
+    fontFamily: 'PublicSans_400Regular',
+    color: '#17233D',
+    backgroundColor: '#fff',
   },
   button: {
-    backgroundColor: '#1e40af',
-    borderRadius: 10,
-    paddingVertical: 14,
+    backgroundColor: '#1E73CE',
+    borderRadius: 9,
+    height: 46,
+    paddingHorizontal: 24,
     alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 24,
+    shadowColor: '#1E73CE',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 16,
+    elevation: 5,
   },
   buttonDisabled: {
-    opacity: 0.6,
+    backgroundColor: '#EAEEF4',
+    shadowOpacity: 0,
+    elevation: 0,
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Manrope_700Bold',
   },
   signupLink: {
     marginTop: 24,
@@ -167,10 +180,11 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 14,
-    color: '#6b7280',
+    fontFamily: 'PublicSans_400Regular',
+    color: '#64728A',
   },
   signupTextBold: {
-    color: '#1e40af',
-    fontWeight: '600',
+    color: '#1E73CE',
+    fontFamily: 'PublicSans_600SemiBold',
   },
 });

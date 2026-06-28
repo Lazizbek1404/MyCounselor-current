@@ -7,6 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
 
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 interface LinkedChild {
   id: string;
   firstName: string;
@@ -98,7 +104,7 @@ export default function ParentChildrenScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -160,78 +166,87 @@ export default function ParentChildrenScreen() {
             </View>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={s.card}>
-            {/* Avatar */}
-            <View style={s.avatar}>
-              <Text style={s.avatarText}>{item.firstName[0]}{item.lastName[0]}</Text>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <View style={s.cardTop}>
-                <Text style={s.cardName}>{item.firstName} {item.lastName}</Text>
-                <View style={s.confirmedBadge}>
-                  <Text style={s.confirmedText}>Confirmed</Text>
-                </View>
+        renderItem={({ item }) => {
+          const fullName = `${item.firstName} ${item.lastName}`;
+          return (
+            <View style={s.card}>
+              {/* Avatar */}
+              <View style={[s.avatar, { backgroundColor: getAvatarBg(fullName) }]}>
+                <Text style={s.avatarText}>{item.firstName[0]}{item.lastName[0]}</Text>
               </View>
 
-              <View style={s.infoRows}>
-                <View style={s.infoRow}>
-                  <Text style={s.infoLabel}>Email</Text>
-                  <Text style={s.infoValue}>{item.email}</Text>
+              <View style={{ flex: 1 }}>
+                <View style={s.cardTop}>
+                  <Text style={s.cardName}>{fullName}</Text>
+                  <View style={s.confirmedBadge}>
+                    <Text style={s.confirmedText}>Confirmed</Text>
+                  </View>
                 </View>
-                {item.gradeLevel && (
+
+                <View style={s.infoRows}>
                   <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>Grade</Text>
-                    <Text style={s.infoValue}>{item.gradeLevel}</Text>
+                    <Text style={s.infoLabel}>Email</Text>
+                    <Text style={s.infoValue}>{item.email}</Text>
                   </View>
-                )}
-                {item.schoolName && (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>School</Text>
-                    <Text style={s.infoValue}>{item.schoolName}</Text>
-                  </View>
-                )}
-                {item.counselorName && (
-                  <View style={s.infoRow}>
-                    <Text style={s.infoLabel}>Counselor</Text>
-                    <Text style={s.infoValue}>{item.counselorName}</Text>
-                  </View>
-                )}
+                  {item.gradeLevel && (
+                    <View style={s.infoRow}>
+                      <Text style={s.infoLabel}>Grade</Text>
+                      <Text style={s.infoValue}>{item.gradeLevel}</Text>
+                    </View>
+                  )}
+                  {item.schoolName && (
+                    <View style={s.infoRow}>
+                      <Text style={s.infoLabel}>School</Text>
+                      <Text style={s.infoValue}>{item.schoolName}</Text>
+                    </View>
+                  )}
+                  {item.counselorName && (
+                    <View style={s.infoRow}>
+                      <Text style={s.infoLabel}>Counselor</Text>
+                      <Text style={s.infoValue}>{item.counselorName}</Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
-          </View>
-        )}
+          );
+        }}
       />
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  headerCount: { fontSize: 13, color: '#6b7280' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  headerCount: { fontSize: 13, fontFamily: 'PublicSans_500Medium', color: '#64728A' },
   // Instructions
   instructionsWrapper: { flex: 1, padding: 16 },
-  instructionsCard: { backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: '#e5e7eb' },
-  instructionsTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 10 },
-  instructionsText: { fontSize: 14, color: '#374151', lineHeight: 21, marginBottom: 10 },
-  namesBox: { backgroundColor: '#f9fafb', borderRadius: 8, padding: 12, marginTop: 4 },
-  namesLabel: { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 6 },
-  nameItem: { fontSize: 14, color: '#111827', marginBottom: 2 },
+  instructionsCard: {
+    backgroundColor: '#fff', borderRadius: 14, padding: 20, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
+  instructionsTitle: { fontSize: 16, fontFamily: 'Manrope_700Bold', color: '#17233D', marginBottom: 10 },
+  instructionsText: { fontSize: 14, fontFamily: 'PublicSans_400Regular', color: '#36425A', lineHeight: 21, marginBottom: 10 },
+  namesBox: { backgroundColor: '#F4F7FB', borderRadius: 8, padding: 12, marginTop: 4 },
+  namesLabel: { fontSize: 12, fontFamily: 'PublicSans_600SemiBold', color: '#64728A', marginBottom: 6 },
+  nameItem: { fontSize: 14, fontFamily: 'PublicSans_400Regular', color: '#17233D', marginBottom: 2 },
   // Cards
-  card: { flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
-  avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  card: {
+    flexDirection: 'row', gap: 12, backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
+  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 2 },
+  avatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 16 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8 },
-  cardName: { fontSize: 15, fontWeight: '700', color: '#111827', flex: 1 },
+  cardName: { fontSize: 15, fontFamily: 'Manrope_700Bold', color: '#17233D', flex: 1 },
   confirmedBadge: { backgroundColor: '#dcfce7', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  confirmedText: { fontSize: 11, fontWeight: '700', color: '#15803d' },
+  confirmedText: { fontSize: 11, fontFamily: 'PublicSans_700Bold', color: '#15803d' },
   // Info rows
   infoRows: { gap: 6 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  infoLabel: { fontSize: 12, color: '#6b7280', fontWeight: '500' },
-  infoValue: { fontSize: 12, color: '#111827', fontWeight: '600', flexShrink: 1, textAlign: 'right', maxWidth: '60%' },
+  infoLabel: { fontSize: 12, fontFamily: 'PublicSans_500Medium', color: '#64728A' },
+  infoValue: { fontSize: 12, fontFamily: 'PublicSans_600SemiBold', color: '#17233D', flexShrink: 1, textAlign: 'right', maxWidth: '60%' },
 });

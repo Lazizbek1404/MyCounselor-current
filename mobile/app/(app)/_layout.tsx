@@ -5,10 +5,10 @@ import { useAuth } from '../../context/AuthContext';
 
 const TAB_OPTIONS = {
   headerShown: false,
-  tabBarActiveTintColor: '#1e40af',
-  tabBarInactiveTintColor: '#9ca3af',
-  tabBarStyle: { borderTopColor: '#e5e7eb', height: 60 },
-  tabBarLabelStyle: { fontSize: 11, fontWeight: '500' as const, paddingBottom: 4 },
+  tabBarActiveTintColor: '#1E73CE',
+  tabBarInactiveTintColor: '#95A2B6',
+  tabBarStyle: { borderTopColor: '#EEF2F8', borderTopWidth: 1, height: 64, backgroundColor: '#FFFFFF' },
+  tabBarLabelStyle: { fontSize: 11, fontFamily: 'PublicSans_700Bold', paddingBottom: 4 },
 };
 
 export default function AppLayout() {

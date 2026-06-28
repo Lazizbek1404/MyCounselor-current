@@ -73,19 +73,10 @@ function statusLabel(s: RequestStatus) {
   return s === 'in_progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function statusColor(s: RequestStatus) {
-  switch (s) {
-    case 'pending': return '#f59e0b';
-    case 'in_progress': return '#3b82f6';
-    case 'approved': return '#22c55e';
-    case 'closed': return '#6b7280';
-  }
-}
-
 function meetingStatusColor(s: string) {
-  if (s === 'confirmed') return '#22c55e';
-  if (s === 'cancelled') return '#ef4444';
-  return '#f59e0b';
+  if (s === 'confirmed') return '#27A869';
+  if (s === 'cancelled') return '#E5483B';
+  return '#E2A437';
 }
 
 function fmtDate(v: string) {
@@ -102,6 +93,23 @@ function computeUnread(messages: { sender_role: string }[], role: string) {
   if (lastOwnIdx === -1) return messages.filter(m => m.sender_role !== role).length;
   return lastOwnIdx;
 }
+
+// ── Avatar helpers ─────────────────────────────────────────────────────────────
+
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
+// ── Status badge config ────────────────────────────────────────────────────────
+
+const STATUS_BADGE: Record<RequestStatus, { bg: string; text: string; dot: string }> = {
+  pending:     { bg: '#FBEFD6', text: '#9A6A12', dot: '#E2A437' },
+  in_progress: { bg: '#E2EEFB', text: '#1A63B8', dot: '#2C7FD6' },
+  approved:    { bg: '#DCF1E6', text: '#1B8A54', dot: '#27A869' },
+  closed:      { bg: '#EAEEF4', text: '#5C6B82', dot: '#94A3B8' },
+};
 
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
@@ -266,7 +274,7 @@ export default function StudentDashboardScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -289,10 +297,10 @@ export default function StudentDashboardScreen() {
           <Text style={s.greeting}>{greeting},</Text>
           <Text style={s.name}>{user?.firstName ?? 'Student'}</Text>
 
-          <View style={[s.card, { borderColor: '#f59e0b', borderWidth: 1.5, marginTop: 20 }]}>
-            <Text style={[s.cardTitle, { color: '#b45309' }]}>Account Pending Approval</Text>
+          <View style={[s.card, { borderColor: '#E2A437', borderWidth: 1.5, marginTop: 20 }]}>
+            <Text style={[s.cardTitle, { color: '#9A6A12' }]}>Account Pending Approval</Text>
             <Text style={s.body}>Your account was created. A school counselor needs to approve it before you can access all features. This usually takes 1–2 school days.</Text>
-            <Text style={[s.body, { color: '#f59e0b', fontWeight: '600', marginTop: 8 }]}>⏳ Waiting for counselor approval</Text>
+            <Text style={[s.body, { color: '#E2A437', marginTop: 8 }]}>Waiting for counselor approval</Text>
           </View>
 
           {counselors.length > 0 && (
@@ -358,10 +366,10 @@ export default function StudentDashboardScreen() {
                 <Text style={s.cardTitle}>{p.firstName} {p.lastName}</Text>
                 <Text style={s.muted}>{p.relationship} — wants to link as your parent</Text>
                 <View style={s.row}>
-                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#22c55e' }]} onPress={() => confirmParent(p.id)}>
+                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#27A869' }]} onPress={() => confirmParent(p.id)}>
                     <Text style={s.smallBtnText}>Confirm</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#ef4444' }]} onPress={() => rejectParent(p.id)}>
+                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#E5483B' }]} onPress={() => rejectParent(p.id)}>
                     <Text style={s.smallBtnText}>Reject</Text>
                   </TouchableOpacity>
                 </View>
@@ -374,20 +382,30 @@ export default function StudentDashboardScreen() {
         {counselors.length > 0 && (
           <>
             <Text style={s.sectionTitle}>Your Counselor(s)</Text>
-            {counselors.map(c => (
-              <View key={c.id} style={s.card}>
-                <Text style={s.cardTitle}>{c.firstName} {c.lastName}</Text>
-                <Text style={s.muted}>{c.title ?? 'School Counselor'}{c.department ? ` · ${c.department}` : ''}</Text>
-                <View style={s.row}>
-                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#22c55e' }]} onPress={() => router.push('/(app)/student/messages' as any)}>
-                    <Text style={s.smallBtnText}>Message</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#1e40af' }]} onPress={() => router.push('/(app)/student/meetings' as any)}>
-                    <Text style={s.smallBtnText}>Book Meeting</Text>
-                  </TouchableOpacity>
+            {counselors.map(c => {
+              const avatarBg = getAvatarBg(`${c.firstName} ${c.lastName}`);
+              return (
+                <View key={c.id} style={s.card}>
+                  <View style={s.counselorRow}>
+                    <View style={[s.avatar, { backgroundColor: avatarBg }]}>
+                      <Text style={s.avatarText}>{c.firstName[0]}{c.lastName[0]}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.cardTitle}>{c.firstName} {c.lastName}</Text>
+                      <Text style={s.muted}>{c.title ?? 'School Counselor'}{c.department ? ` · ${c.department}` : ''}</Text>
+                    </View>
+                  </View>
+                  <View style={s.row}>
+                    <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#27A869' }]} onPress={() => router.push('/(app)/student/messages' as any)}>
+                      <Text style={s.smallBtnText}>Message</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[s.smallBtn, { backgroundColor: '#1E73CE' }]} onPress={() => router.push('/(app)/student/meetings' as any)}>
+                      <Text style={s.smallBtnText}>Book Meeting</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </>
         )}
 
@@ -399,18 +417,24 @@ export default function StudentDashboardScreen() {
           </TouchableOpacity>
         </View>
         {requests.slice(0, 3).length > 0 ? (
-          requests.slice(0, 3).map(r => (
-            <View key={r.id} style={s.card}>
-              <View style={s.row}>
-                <Text style={[s.cardTitle, { flex: 1 }]}>{r.title}</Text>
-                <StatusBadge label={statusLabel(r.status)} color={statusColor(r.status)} />
+          requests.slice(0, 3).map(r => {
+            const badge = STATUS_BADGE[r.status];
+            return (
+              <View key={r.id} style={s.card}>
+                <View style={s.row}>
+                  <Text style={[s.cardTitle, { flex: 1 }]}>{r.title}</Text>
+                  <View style={[s.statusBadge, { backgroundColor: badge.bg }]}>
+                    <View style={[s.statusDot, { backgroundColor: badge.dot }]} />
+                    <Text style={[s.statusBadgeText, { color: badge.text }]}>{statusLabel(r.status)}</Text>
+                  </View>
+                </View>
+                <Text style={s.muted}>{r.counselor} · {r.createdAt}</Text>
+                <View style={[s.chip, { marginTop: 6 }]}>
+                  <Text style={s.chipText}>{r.category}</Text>
+                </View>
               </View>
-              <Text style={s.muted}>{r.counselor} · {r.createdAt}</Text>
-              <View style={[s.chip, { marginTop: 6 }]}>
-                <Text style={s.chipText}>{r.category}</Text>
-              </View>
-            </View>
-          ))
+            );
+          })
         ) : (
           <EmptyNote text="No requests yet." />
         )}
@@ -427,7 +451,10 @@ export default function StudentDashboardScreen() {
             <View key={m.id} style={s.card}>
               <View style={s.row}>
                 <Text style={[s.cardTitle, { flex: 1 }]}>{m.title}</Text>
-                <StatusBadge label={m.type === 'video' ? 'Video' : 'In-Person'} color="#1e40af" />
+                <View style={[s.statusBadge, { backgroundColor: '#E2EEFB' }]}>
+                  <View style={[s.statusDot, { backgroundColor: '#2C7FD6' }]} />
+                  <Text style={[s.statusBadgeText, { color: '#1A63B8' }]}>{m.type === 'video' ? 'Video' : 'In-Person'}</Text>
+                </View>
               </View>
               <Text style={s.muted}>{m.counselor}</Text>
               <Text style={s.muted}>{m.date} · {m.time}</Text>
@@ -447,7 +474,7 @@ export default function StudentDashboardScreen() {
         {resources.length > 0 ? (
           resources.map(r => (
             <View key={r.id} style={s.card}>
-              <Text style={[s.muted, { fontWeight: '600', color: '#1e40af', marginBottom: 2 }]}>
+              <Text style={[s.muted, { color: '#1E73CE', marginBottom: 2, fontFamily: 'PublicSans_600SemiBold' }]}>
                 {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
               </Text>
               <Text style={s.cardTitle}>{r.title}</Text>
@@ -467,12 +494,12 @@ export default function StudentDashboardScreen() {
               <View key={g.id} style={s.card}>
                 <View style={s.row}>
                   <Text style={[s.cardTitle, { flex: 1 }]}>{g.title}</Text>
-                  <Text style={{ fontWeight: '700', color: '#1e40af' }}>{g.progress}%</Text>
+                  <Text style={{ fontFamily: 'Manrope_700Bold', color: '#1E73CE' }}>{g.progress}%</Text>
                 </View>
                 <Text style={s.muted}>Due: {g.deadline} · Priority: {g.priority}</Text>
                 {/* Progress bar */}
                 <View style={s.progressBar}>
-                  <View style={[s.progressFill, { width: `${g.progress}%` as any, backgroundColor: g.progress >= 75 ? '#22c55e' : g.progress >= 50 ? '#1e40af' : g.progress >= 25 ? '#f59e0b' : '#ef4444' }]} />
+                  <View style={[s.progressFill, { width: `${g.progress}%` as any, backgroundColor: g.progress >= 75 ? '#27A869' : g.progress >= 50 ? '#1E73CE' : g.progress >= 25 ? '#E2A437' : '#E5483B' }]} />
                 </View>
                 {editingGoalId === g.id ? (
                   <View style={[s.row, { marginTop: 8 }]}>
@@ -511,18 +538,10 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
   );
 }
 
-function StatusBadge({ label, color }: { label: string; color: string }) {
-  return (
-    <View style={[s.badge, { backgroundColor: color }]}>
-      <Text style={s.badgeText}>{label}</Text>
-    </View>
-  );
-}
-
 function EmptyNote({ text }: { text: string }) {
   return (
     <View style={s.emptyNote}>
-      <Text style={s.muted}>{text}</Text>
+      <Text style={s.emptyNoteText}>{text}</Text>
     </View>
   );
 }
@@ -530,25 +549,33 @@ function EmptyNote({ text }: { text: string }) {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F7FB' },
   scroll: { padding: 16, paddingBottom: 40 },
-  greeting: { fontSize: 14, color: '#6b7280' },
-  name: { fontSize: 26, fontWeight: '700', color: '#111827', marginTop: 2 },
-  muted: { fontSize: 13, color: '#6b7280' },
-  body: { fontSize: 14, color: '#374151', lineHeight: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginTop: 20, marginBottom: 10 },
+  greeting: { fontSize: 14, color: '#64728A', fontFamily: 'PublicSans_400Regular' },
+  name: { fontSize: 26, color: '#17233D', marginTop: 2, fontFamily: 'Manrope_800ExtraBold' },
+  muted: { fontSize: 13, color: '#64728A', fontFamily: 'PublicSans_500Medium' },
+  body: { fontSize: 14, color: '#36425A', lineHeight: 20, fontFamily: 'PublicSans_400Regular' },
+  sectionTitle: { fontSize: 16, color: '#17233D', marginTop: 20, marginBottom: 10, fontFamily: 'Manrope_700Bold' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, marginBottom: 10 },
-  link: { fontSize: 13, color: '#1e40af', fontWeight: '600' },
+  link: { fontSize: 13, color: '#1E73CE', fontFamily: 'PublicSans_600SemiBold' },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: '#E6EBF2',
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  cardTitle: { fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 4 },
+  cardTitle: { fontSize: 14, color: '#17233D', marginBottom: 4, fontFamily: 'Manrope_700Bold' },
+  counselorRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  avatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 15 },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 16 },
   statCard: {
     flex: 1,
@@ -557,62 +584,72 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: '#E6EBF2',
     alignItems: 'center',
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  statValue: { fontSize: 24, fontWeight: '700', color: '#1e40af' },
-  statLabel: { fontSize: 12, color: '#6b7280', marginTop: 4, textAlign: 'center' },
+  statValue: { fontSize: 24, color: '#1E73CE', fontFamily: 'Manrope_700Bold' },
+  statLabel: { fontSize: 12, color: '#64728A', marginTop: 4, textAlign: 'center', fontFamily: 'PublicSans_500Medium' },
   actionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   actionBtn: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: '#eff6ff',
+    backgroundColor: '#E2EEFB',
     borderRadius: 10,
     padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#bfdbfe',
+    borderColor: '#CFE0F4',
   },
-  actionLabel: { fontSize: 14, fontWeight: '600', color: '#1e40af' },
+  actionLabel: { fontSize: 14, color: '#1E73CE', fontFamily: 'Manrope_700Bold' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  badge: {
-    borderRadius: 20,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    gap: 5,
   },
-  badgeText: { fontSize: 11, color: '#fff', fontWeight: '600' },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusBadgeText: { fontFamily: 'PublicSans_700Bold', fontSize: 12 },
   chip: {
     alignSelf: 'flex-start',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#F4F7FB',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 3,
   },
-  chipText: { fontSize: 11, color: '#374151', fontWeight: '500' },
+  chipText: { fontSize: 11, color: '#36425A', fontFamily: 'PublicSans_500Medium' },
   smallBtn: {
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 7,
   },
-  smallBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
-  progressBar: { height: 6, backgroundColor: '#f3f4f6', borderRadius: 3, marginTop: 8, overflow: 'hidden' },
+  smallBtnText: { color: '#fff', fontSize: 13, fontFamily: 'Manrope_700Bold' },
+  progressBar: { height: 6, backgroundColor: '#F4F7FB', borderRadius: 3, marginTop: 8, overflow: 'hidden' },
   progressFill: { height: '100%', borderRadius: 3 },
   nudgeBtn: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#E6EBF2',
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 5,
   },
-  nudgeBtnText: { fontSize: 13, color: '#374151', fontWeight: '500' },
+  nudgeBtnText: { fontSize: 13, color: '#36425A', fontFamily: 'PublicSans_500Medium' },
   emptyNote: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#F4F7FB',
     borderRadius: 10,
     padding: 16,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderStyle: 'dashed',
+    borderColor: '#E6EBF2',
     marginBottom: 10,
   },
+  emptyNoteText: { fontFamily: 'PublicSans_500Medium', color: '#64728A' },
 });

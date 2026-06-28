@@ -26,10 +26,10 @@ const CATEGORIES = ['College', 'Career', 'Academic', 'Wellness'];
 const TYPES = ['article', 'video', 'worksheet', 'guide'];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  college: '#8b5cf6',
-  career: '#f59e0b',
-  academic: '#3b82f6',
-  wellness: '#22c55e',
+  college: '#7C6CD6',
+  career: '#E2A437',
+  academic: '#2C7FD6',
+  wellness: '#27A869',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -177,7 +177,7 @@ export default function CounselorGuidanceScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -206,17 +206,19 @@ export default function CounselorGuidanceScreen() {
           </View>
         }
         renderItem={({ item }) => {
-          const catColor = CATEGORY_COLORS[item.category?.toLowerCase()] ?? '#6b7280';
+          const catColor = CATEGORY_COLORS[item.category?.toLowerCase()] ?? '#64728A';
           return (
             <TouchableOpacity style={s.card} onPress={() => openEdit(item)}>
               <View style={s.cardTop}>
-                <View style={[s.categoryBadge, { backgroundColor: catColor + '20' }]}>
+                <View style={[s.categoryBadge, { backgroundColor: catColor + '22' }]}>
                   <Text style={[s.categoryText, { color: catColor }]}>
                     {capitalize(item.category ?? 'General')}
                   </Text>
                 </View>
                 <View style={[s.statusBadge, item.status === 'published' ? s.statusPublished : s.statusDraft]}>
-                  <Text style={s.statusText}>{item.status}</Text>
+                  <Text style={[s.statusText, item.status === 'published' ? s.statusTextPublished : s.statusTextDraft]}>
+                    {item.status}
+                  </Text>
                 </View>
               </View>
               <Text style={s.cardTitle}>{item.title}</Text>
@@ -321,7 +323,7 @@ function ResourceForm({
         value={title}
         onChangeText={setTitle}
         placeholder="Resource title"
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor="#95A2B6"
       />
 
       <Text style={s.label}>Description</Text>
@@ -330,7 +332,7 @@ function ResourceForm({
         value={description}
         onChangeText={setDescription}
         placeholder="Brief description…"
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor="#95A2B6"
         multiline
         numberOfLines={4}
         textAlignVertical="top"
@@ -391,53 +393,68 @@ function ResourceForm({
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  muted: { fontSize: 13, color: '#6b7280' },
+  muted: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A' },
   emptyState: { alignItems: 'center', paddingTop: 40 },
   // Header
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  newBtn: { backgroundColor: '#1e40af', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 },
-  newBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  newBtn: {
+    backgroundColor: '#1E73CE', borderRadius: 9, paddingHorizontal: 20, height: 46,
+    justifyContent: 'center', alignItems: 'center',
+    shadowColor: '#1E73CE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.28, shadowRadius: 16, elevation: 5,
+  },
+  newBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 14 },
   // Cards
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
+  card: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
   cardTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 },
   categoryBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  categoryText: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  categoryText: { fontSize: 11, fontFamily: 'PublicSans_700Bold', textTransform: 'uppercase', letterSpacing: 0.5 },
   statusBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  statusPublished: { backgroundColor: '#dcfce7' },
-  statusDraft: { backgroundColor: '#f3f4f6' },
-  statusText: { fontSize: 11, fontWeight: '700', color: '#111827', textTransform: 'capitalize' },
-  cardTitle: { fontSize: 15, fontWeight: '600', color: '#111827', marginBottom: 4 },
-  cardDesc: { fontSize: 13, color: '#6b7280', lineHeight: 19, marginBottom: 8 },
+  statusPublished: { backgroundColor: '#DCF1E6' },
+  statusDraft: { backgroundColor: '#F4F7FB' },
+  statusText: { fontSize: 11, fontFamily: 'PublicSans_700Bold', textTransform: 'capitalize' },
+  statusTextPublished: { color: '#1B8A54' },
+  statusTextDraft: { color: '#5C6B82' },
+  cardTitle: { fontSize: 15, fontFamily: 'Manrope_700Bold', color: '#17233D', marginBottom: 4 },
+  cardDesc: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A', lineHeight: 19, marginBottom: 8 },
   cardBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  typeBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#f3f4f6' },
-  typeText: { fontSize: 11, color: '#6b7280', fontWeight: '500', textTransform: 'capitalize' },
-  cardDate: { fontSize: 12, color: '#9ca3af' },
-  toggleBtn: { borderRadius: 8, paddingVertical: 8, alignItems: 'center' },
-  toggleBtnPublish: { backgroundColor: '#1e40af' },
-  toggleBtnUnpublish: { backgroundColor: '#6b7280' },
-  toggleBtnText: { color: '#fff', fontWeight: '600', fontSize: 13 },
+  typeBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#F4F7FB' },
+  typeText: { fontSize: 11, fontFamily: 'PublicSans_500Medium', color: '#64728A', textTransform: 'capitalize' },
+  cardDate: { fontSize: 12, fontFamily: 'PublicSans_500Medium', color: '#95A2B6' },
+  toggleBtn: { borderRadius: 9, height: 46, alignItems: 'center', justifyContent: 'center' },
+  toggleBtnPublish: {
+    backgroundColor: '#1E73CE',
+    shadowColor: '#1E73CE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.28, shadowRadius: 16, elevation: 5,
+  },
+  toggleBtnUnpublish: { backgroundColor: '#64728A' },
+  toggleBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 13 },
   // Modal
-  modalContainer: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  cancelText: { fontSize: 15, color: '#1e40af' },
+  modalContainer: { flex: 1, backgroundColor: '#F4F7FB' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  modalTitle: { fontSize: 17, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  cancelText: { fontSize: 15, fontFamily: 'PublicSans_600SemiBold', color: '#1E73CE' },
   modalBody: { padding: 16, paddingBottom: 40 },
-  label: { fontSize: 13, fontWeight: '600', color: '#374151', marginTop: 16, marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#111827', backgroundColor: '#fff' },
+  label: { fontSize: 13, fontFamily: 'PublicSans_600SemiBold', color: '#36425A', marginTop: 16, marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, fontFamily: 'PublicSans_400Regular', color: '#17233D', backgroundColor: '#fff' },
   textArea: { height: 100 },
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: '#fff' },
-  chipSelected: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  chipText: { fontSize: 13, color: '#374151', fontWeight: '500' },
-  chipTextSelected: { color: '#fff', fontWeight: '700' },
+  chip: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: '#fff' },
+  chipSelected: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  chipText: { fontSize: 13, fontFamily: 'PublicSans_500Medium', color: '#36425A' },
+  chipTextSelected: { color: '#fff', fontFamily: 'Manrope_700Bold' },
   typeRow: { flexDirection: 'row', gap: 10 },
-  typeChip: { flex: 1, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingVertical: 10, alignItems: 'center', backgroundColor: '#fff' },
-  typeChipSelected: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  typeChipText: { fontSize: 14, color: '#374151', fontWeight: '500' },
-  typeChipTextSelected: { color: '#fff', fontWeight: '700' },
-  submitBtn: { backgroundColor: '#1e40af', borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
-  submitBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  typeChip: { flex: 1, borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 8, paddingVertical: 10, alignItems: 'center', backgroundColor: '#fff' },
+  typeChipSelected: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  typeChipText: { fontSize: 14, fontFamily: 'PublicSans_500Medium', color: '#36425A' },
+  typeChipTextSelected: { color: '#fff', fontFamily: 'Manrope_700Bold' },
+  submitBtn: {
+    backgroundColor: '#1E73CE', borderRadius: 9, height: 46, alignItems: 'center', justifyContent: 'center', marginTop: 24,
+    shadowColor: '#1E73CE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.28, shadowRadius: 16, elevation: 5,
+  },
+  submitBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 16 },
 });

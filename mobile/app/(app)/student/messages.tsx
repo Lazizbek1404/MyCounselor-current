@@ -52,6 +52,14 @@ function formatDay(v: string) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+// ── Avatar helper ──────────────────────────────────────────────────────────────
+
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
 export default function StudentMessagesScreen() {
@@ -173,7 +181,7 @@ export default function StudentMessagesScreen() {
     return (
       <SafeAreaView style={s.center}>
         <Tabs.Screen options={{ tabBarBadge: undefined }} />
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -233,7 +241,7 @@ export default function StudentMessagesScreen() {
               value={input}
               onChangeText={setInput}
               placeholder="Type a message…"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor="#95A2B6"
               multiline
               maxLength={1000}
             />
@@ -273,6 +281,7 @@ export default function StudentMessagesScreen() {
             const msgs = messagesByKey[key] ?? [];
             const lastMsg = msgs[msgs.length - 1];
             const unread = computeUnread(msgs);
+            const avatarBg = getAvatarBg(`${item.firstName} ${item.lastName}`);
 
             return (
               <TouchableOpacity
@@ -282,7 +291,7 @@ export default function StudentMessagesScreen() {
                 }}
               >
                 {/* Avatar */}
-                <View style={s.avatar}>
+                <View style={[s.avatar, { backgroundColor: avatarBg }]}>
                   <Text style={s.avatarText}>{item.firstName[0]}{item.lastName[0]}</Text>
                 </View>
 
@@ -317,40 +326,89 @@ export default function StudentMessagesScreen() {
 
 const s = StyleSheet.create({
   flex: { flex: 1 },
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
-  muted: { fontSize: 13, color: '#6b7280' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F7FB' },
+  muted: { fontSize: 13, color: '#64728A', fontFamily: 'PublicSans_500Medium' },
   // List
-  listHeader: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  listHeaderTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  convCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
-  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  listHeader: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  listHeaderTitle: { fontSize: 18, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  convCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E6EBF2',
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  avatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 15 },
   convRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
-  convName: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  convTime: { fontSize: 12, color: '#9ca3af' },
-  lastMsg: { fontSize: 13, color: '#6b7280', marginTop: 2 },
-  unreadBadge: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  unreadText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  convName: { fontSize: 15, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  convTime: { fontSize: 12, color: '#95A2B6', fontFamily: 'PublicSans_500Medium' },
+  lastMsg: { fontSize: 13, color: '#64728A', marginTop: 2, fontFamily: 'PublicSans_500Medium' },
+  unreadBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 999,
+    paddingHorizontal: 5,
+    backgroundColor: '#E0785A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  unreadText: { color: '#fff', fontFamily: 'PublicSans_700Bold', fontSize: 10 },
   // Thread
-  threadHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
+  threadHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
   backBtn: { paddingRight: 4 },
-  backText: { fontSize: 15, color: '#1e40af' },
-  threadName: { fontSize: 15, fontWeight: '700', color: '#111827' },
-  threadSub: { fontSize: 12, color: '#6b7280' },
+  backText: { fontSize: 15, color: '#1E73CE', fontFamily: 'PublicSans_600SemiBold' },
+  threadName: { fontSize: 15, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  threadSub: { fontSize: 12, color: '#64728A', fontFamily: 'PublicSans_500Medium' },
   messageList: { padding: 16, paddingBottom: 8 },
   emptyThread: { flex: 1, alignItems: 'center', paddingTop: 40 },
   msgRow: { marginBottom: 10, flexDirection: 'row' },
   msgRowRight: { justifyContent: 'flex-end' },
   msgRowLeft: { justifyContent: 'flex-start' },
   bubble: { maxWidth: '78%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 10 },
-  bubbleMe: { backgroundColor: '#1e40af', borderBottomRightRadius: 4 },
-  bubbleThem: { backgroundColor: '#fff', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: '#e5e7eb' },
-  bubbleText: { fontSize: 15, color: '#111827', lineHeight: 21 },
-  bubbleTime: { fontSize: 11, color: '#6b7280', marginTop: 4, textAlign: 'right' },
+  bubbleMe: { backgroundColor: '#1E73CE', borderBottomRightRadius: 4 },
+  bubbleThem: { backgroundColor: '#fff', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: '#E6EBF2' },
+  bubbleText: { fontSize: 15, color: '#17233D', lineHeight: 21, fontFamily: 'PublicSans_400Regular' },
+  bubbleTime: { fontSize: 11, color: '#64728A', marginTop: 4, textAlign: 'right', fontFamily: 'PublicSans_500Medium' },
   // Input bar
-  inputBar: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#e5e7eb' },
-  inputField: { flex: 1, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#111827', maxHeight: 100, backgroundColor: '#f9fafb' },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center' },
+  inputBar: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 10, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E6EBF2' },
+  inputField: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#E6EBF2',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: '#17233D',
+    maxHeight: 100,
+    backgroundColor: '#F4F7FB',
+    fontFamily: 'PublicSans_400Regular',
+  },
+  sendBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#1E73CE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#1E73CE',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.34,
+    shadowRadius: 18,
+    elevation: 8,
+  },
   sendBtnDisabled: { opacity: 0.35 },
 });

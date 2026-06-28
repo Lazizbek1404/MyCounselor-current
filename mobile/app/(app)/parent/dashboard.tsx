@@ -7,6 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
 
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 interface ParentProfile {
   childrenNames: string[];
   studentConfirmed: boolean;
@@ -119,12 +125,14 @@ export default function ParentDashboardScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
 
   const isPending = !profile?.studentConfirmed;
+  const firstName = user?.firstName ?? '';
+  const avatarBg = getAvatarBg(firstName || 'P');
 
   return (
     <SafeAreaView style={s.container}>
@@ -134,6 +142,9 @@ export default function ParentDashboardScreen() {
       >
         {/* Welcome */}
         <View style={s.welcomeCard}>
+          <View style={[s.welcomeAvatar, { backgroundColor: avatarBg }]}>
+            <Text style={s.welcomeAvatarText}>{(firstName || 'P')[0].toUpperCase()}</Text>
+          </View>
           <Text style={s.welcomeName}>Welcome, {user?.firstName}</Text>
           {profile?.relationship && (
             <Text style={s.welcomeSub}>{profile.relationship}</Text>
@@ -163,25 +174,28 @@ export default function ParentDashboardScreen() {
         {!isPending && children.length > 0 && (
           <View style={s.section}>
             <Text style={s.sectionTitle}>Your Children</Text>
-            {children.map(child => (
-              <View key={child.id} style={s.childCard}>
-                <View style={s.avatar}>
-                  <Text style={s.avatarText}>{child.firstName[0]}{child.lastName[0]}</Text>
+            {children.map(child => {
+              const fullName = `${child.firstName} ${child.lastName}`;
+              return (
+                <View key={child.id} style={s.childCard}>
+                  <View style={[s.avatar, { backgroundColor: getAvatarBg(fullName) }]}>
+                    <Text style={s.avatarText}>{child.firstName[0]}{child.lastName[0]}</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.childName}>{fullName}</Text>
+                    {child.gradeLevel && (
+                      <Text style={s.childMeta}>Grade {child.gradeLevel}</Text>
+                    )}
+                    {child.schoolName && (
+                      <Text style={s.childMeta}>{child.schoolName}</Text>
+                    )}
+                  </View>
+                  <View style={s.confirmedBadge}>
+                    <Text style={s.confirmedText}>Confirmed</Text>
+                  </View>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.childName}>{child.firstName} {child.lastName}</Text>
-                  {child.gradeLevel && (
-                    <Text style={s.childMeta}>Grade {child.gradeLevel}</Text>
-                  )}
-                  {child.schoolName && (
-                    <Text style={s.childMeta}>{child.schoolName}</Text>
-                  )}
-                </View>
-                <View style={s.confirmedBadge}>
-                  <Text style={s.confirmedText}>Confirmed</Text>
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
@@ -192,7 +206,7 @@ export default function ParentDashboardScreen() {
             <Text style={s.statLabel}>Linked Children</Text>
           </View>
           <View style={[s.statCard, unreadMessages > 0 && s.statCardHighlight]}>
-            <Text style={[s.statValue, unreadMessages > 0 && { color: '#dc2626' }]}>
+            <Text style={[s.statValue, unreadMessages > 0 && { color: '#E5483B' }]}>
               {unreadMessages}
             </Text>
             <Text style={s.statLabel}>Unread Messages</Text>
@@ -217,39 +231,50 @@ export default function ParentDashboardScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { padding: 16 },
   // Welcome
-  welcomeCard: { backgroundColor: '#1e40af', borderRadius: 14, padding: 20, marginBottom: 16 },
-  welcomeName: { fontSize: 20, fontWeight: '800', color: '#fff', marginBottom: 4 },
-  welcomeSub: { fontSize: 14, color: 'rgba(255,255,255,0.85)', marginBottom: 2 },
-  welcomeSchool: { fontSize: 13, color: 'rgba(255,255,255,0.7)' },
+  welcomeCard: { backgroundColor: '#1E73CE', borderRadius: 14, padding: 20, marginBottom: 16, alignItems: 'flex-start' },
+  welcomeAvatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  welcomeAvatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 18 },
+  welcomeName: { fontSize: 20, fontFamily: 'Manrope_800ExtraBold', color: '#fff', marginBottom: 4 },
+  welcomeSub: { fontSize: 14, fontFamily: 'PublicSans_400Regular', color: 'rgba(255,255,255,0.85)', marginBottom: 2 },
+  welcomeSchool: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: 'rgba(255,255,255,0.7)' },
   // Pending
   pendingCard: { backgroundColor: '#fffbeb', borderRadius: 12, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: '#fcd34d' },
-  pendingTitle: { fontSize: 15, fontWeight: '700', color: '#92400e', marginBottom: 6 },
-  pendingText: { fontSize: 13, color: '#78350f', lineHeight: 19, marginBottom: 10 },
+  pendingTitle: { fontSize: 15, fontFamily: 'Manrope_700Bold', color: '#92400e', marginBottom: 6 },
+  pendingText: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#78350f', lineHeight: 19, marginBottom: 10 },
   pendingNames: { borderTopWidth: 1, borderTopColor: '#fcd34d', paddingTop: 10 },
-  pendingLabel: { fontSize: 12, color: '#92400e', fontWeight: '600', marginBottom: 4 },
-  pendingName: { fontSize: 13, color: '#78350f' },
+  pendingLabel: { fontSize: 12, fontFamily: 'PublicSans_600SemiBold', color: '#92400e', marginBottom: 4 },
+  pendingName: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#78350f' },
   // Children
   section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 10 },
-  childCard: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#e5e7eb' },
-  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
-  childName: { fontSize: 14, fontWeight: '600', color: '#111827', marginBottom: 2 },
-  childMeta: { fontSize: 12, color: '#6b7280' },
+  sectionTitle: { fontSize: 15, fontFamily: 'Manrope_700Bold', color: '#17233D', marginBottom: 10 },
+  childCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
+  avatar: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  avatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 14 },
+  childName: { fontSize: 14, fontFamily: 'PublicSans_600SemiBold', color: '#17233D', marginBottom: 2 },
+  childMeta: { fontSize: 12, fontFamily: 'PublicSans_400Regular', color: '#64728A' },
   confirmedBadge: { backgroundColor: '#dcfce7', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  confirmedText: { fontSize: 11, fontWeight: '700', color: '#15803d' },
+  confirmedText: { fontSize: 11, fontFamily: 'PublicSans_700Bold', color: '#15803d' },
   // Stats
   statsRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  statCard: { flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: '#e5e7eb' },
+  statCard: {
+    flex: 1, backgroundColor: '#fff', borderRadius: 12, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
   statCardHighlight: { borderColor: '#fca5a5', backgroundColor: '#fff7f7' },
-  statValue: { fontSize: 24, fontWeight: '800', color: '#1e40af', marginBottom: 4 },
-  statLabel: { fontSize: 11, color: '#6b7280', textAlign: 'center' },
+  statValue: { fontSize: 24, fontFamily: 'Manrope_800ExtraBold', color: '#1E73CE', marginBottom: 4 },
+  statLabel: { fontSize: 11, fontFamily: 'PublicSans_500Medium', color: '#64728A', textAlign: 'center' },
   // Info cards
-  infoCard: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
-  infoText: { fontSize: 14, color: '#374151', lineHeight: 20 },
-  infoStrong: { fontWeight: '700', color: '#1e40af' },
+  infoCard: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
+  infoText: { fontSize: 14, fontFamily: 'PublicSans_400Regular', color: '#36425A', lineHeight: 20 },
+  infoStrong: { fontFamily: 'PublicSans_600SemiBold', color: '#1E73CE' },
 });

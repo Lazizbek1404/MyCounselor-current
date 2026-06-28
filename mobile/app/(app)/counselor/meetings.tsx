@@ -39,16 +39,26 @@ const TIME_SLOTS = [
   '04:00 PM', '04:30 PM',
 ];
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: '#f59e0b',
-  confirmed: '#22c55e',
-  cancelled: '#ef4444',
+const STATUS_BADGE: Record<string, { bg: string; text: string; dot: string }> = {
+  pending:   { bg: '#FBEFD6', text: '#9A6A12', dot: '#E2A437' },
+  confirmed: { bg: '#DCF1E6', text: '#1B8A54', dot: '#27A869' },
+  cancelled: { bg: '#EAEEF4', text: '#5C6B82', dot: '#94A3B8' },
 };
 
 type FilterTab = 'Upcoming' | 'All' | 'Pending';
 const FILTER_TABS: FilterTab[] = ['Upcoming', 'All', 'Pending'];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
+
+function StatusBadge({ status }: { status: string }) {
+  const cfg = STATUS_BADGE[status] ?? { bg: '#EAEEF4', text: '#5C6B82', dot: '#94A3B8' };
+  return (
+    <View style={[s.badge, { backgroundColor: cfg.bg }]}>
+      <View style={[s.badgeDot, { backgroundColor: cfg.dot }]} />
+      <Text style={[s.badgeText, { color: cfg.text }]}>{status}</Text>
+    </View>
+  );
+}
 
 function formatDate(v: string) {
   return new Date(v + 'T00:00:00').toLocaleDateString('en-US', {
@@ -174,7 +184,7 @@ export default function CounselorMeetingsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -224,9 +234,7 @@ export default function CounselorMeetingsScreen() {
           <View style={s.card}>
             <View style={s.cardTop}>
               <Text style={s.cardTitle}>{item.title}</Text>
-              <View style={[s.statusBadge, { backgroundColor: STATUS_COLORS[item.status] ?? '#6b7280' }]}>
-                <Text style={s.statusText}>{item.status}</Text>
-              </View>
+              <StatusBadge status={item.status} />
             </View>
             <Text style={s.cardSub}>{item.student_name}</Text>
             <View style={s.cardRow}>
@@ -283,7 +291,7 @@ export default function CounselorMeetingsScreen() {
               value={title}
               onChangeText={setTitle}
               placeholder="e.g. Academic progress check-in"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor="#95A2B6"
             />
 
             <Text style={s.label}>Student *</Text>
@@ -301,7 +309,7 @@ export default function CounselorMeetingsScreen() {
               value={date}
               onChangeText={setDate}
               placeholder="e.g. 2025-09-15"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor="#95A2B6"
               keyboardType="numbers-and-punctuation"
             />
 
@@ -339,7 +347,7 @@ export default function CounselorMeetingsScreen() {
               value={notes}
               onChangeText={setNotes}
               placeholder="Agenda or any prep notes…"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor="#95A2B6"
               multiline
               numberOfLines={3}
               textAlignVertical="top"
@@ -394,67 +402,81 @@ export default function CounselorMeetingsScreen() {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  muted: { fontSize: 13, color: '#6b7280' },
+  muted: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A' },
   emptyState: { alignItems: 'center', paddingTop: 40 },
   // Header
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  newBtn: { backgroundColor: '#1e40af', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 8 },
-  newBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  newBtn: {
+    backgroundColor: '#1E73CE', borderRadius: 9, paddingHorizontal: 20, height: 46,
+    justifyContent: 'center', alignItems: 'center',
+    shadowColor: '#1E73CE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.28, shadowRadius: 16, elevation: 5,
+  },
+  newBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 14 },
   // Tabs
-  tabsRow: { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
+  tabsRow: { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  tabActive: { borderBottomColor: '#1e40af' },
-  tabText: { fontSize: 14, color: '#6b7280', fontWeight: '500' },
-  tabTextActive: { color: '#1e40af', fontWeight: '700' },
+  tabActive: { borderBottomColor: '#1E73CE' },
+  tabText: { fontSize: 14, fontFamily: 'PublicSans_500Medium', color: '#64728A' },
+  tabTextActive: { color: '#1E73CE', fontFamily: 'Manrope_700Bold' },
   // Cards
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
+  card: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, marginBottom: 4 },
-  cardTitle: { fontSize: 15, fontWeight: '600', color: '#111827', flex: 1 },
-  statusBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  statusText: { color: '#fff', fontSize: 11, fontWeight: '700', textTransform: 'capitalize' },
-  cardSub: { fontSize: 13, color: '#6b7280', marginBottom: 6 },
+  cardTitle: { fontSize: 15, fontFamily: 'PublicSans_600SemiBold', color: '#17233D', flex: 1 },
+  badge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', borderRadius: 999, paddingVertical: 5, paddingHorizontal: 11, gap: 5 },
+  badgeDot: { width: 7, height: 7, borderRadius: 4 },
+  badgeText: { fontFamily: 'PublicSans_700Bold', fontSize: 12, textTransform: 'capitalize' },
+  cardSub: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A', marginBottom: 6 },
   cardRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardMeta: { fontSize: 13, color: '#374151' },
-  typeBadge: { backgroundColor: '#eff6ff', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  typeText: { fontSize: 11, color: '#1e40af', fontWeight: '600' },
-  cardNotes: { fontSize: 13, color: '#6b7280', marginTop: 6 },
+  cardMeta: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#36425A' },
+  typeBadge: { backgroundColor: '#E2EEFB', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
+  typeText: { fontSize: 11, fontFamily: 'PublicSans_600SemiBold', color: '#1E73CE' },
+  cardNotes: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A', marginTop: 6 },
   actionRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  actionBtn: { flex: 1, borderRadius: 8, paddingVertical: 9, alignItems: 'center' },
-  actionBtnConfirm: { backgroundColor: '#22c55e' },
-  actionBtnCancel: { backgroundColor: '#ef4444' },
-  actionBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
+  actionBtn: { flex: 1, borderRadius: 9, height: 46, alignItems: 'center', justifyContent: 'center' },
+  actionBtnConfirm: { backgroundColor: '#27A869' },
+  actionBtnCancel: {
+    backgroundColor: '#E5483B',
+    shadowColor: '#E5483B', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.24, shadowRadius: 16, elevation: 5,
+  },
+  actionBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 13 },
   // Modal
-  modalContainer: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  cancelText: { fontSize: 15, color: '#1e40af' },
+  modalContainer: { flex: 1, backgroundColor: '#F4F7FB' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  modalTitle: { fontSize: 17, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  cancelText: { fontSize: 15, fontFamily: 'PublicSans_600SemiBold', color: '#1E73CE' },
   modalBody: { padding: 16, paddingBottom: 40 },
-  label: { fontSize: 13, fontWeight: '600', color: '#374151', marginTop: 16, marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, color: '#111827', backgroundColor: '#fff' },
+  label: { fontSize: 13, fontFamily: 'PublicSans_600SemiBold', color: '#36425A', marginTop: 16, marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 15, fontFamily: 'PublicSans_400Regular', color: '#17233D', backgroundColor: '#fff' },
   textArea: { height: 80 },
-  pickerBtn: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: '#fff' },
-  pickerBtnText: { fontSize: 15, color: '#111827' },
-  pickerBtnPlaceholder: { fontSize: 15, color: '#9ca3af' },
+  pickerBtn: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: '#fff' },
+  pickerBtnText: { fontSize: 15, fontFamily: 'PublicSans_400Regular', color: '#17233D' },
+  pickerBtnPlaceholder: { fontSize: 15, fontFamily: 'PublicSans_400Regular', color: '#95A2B6' },
   slotsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  slotChip: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: '#fff' },
-  slotChipSelected: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  slotText: { fontSize: 13, color: '#374151' },
-  slotTextSelected: { color: '#fff', fontWeight: '600' },
+  slotChip: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: '#fff' },
+  slotChipSelected: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  slotText: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#36425A' },
+  slotTextSelected: { color: '#fff', fontFamily: 'PublicSans_600SemiBold' },
   typeRow: { flexDirection: 'row', gap: 10 },
-  typeChip: { flex: 1, borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingVertical: 10, alignItems: 'center', backgroundColor: '#fff' },
-  typeChipSelected: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  typeChipText: { fontSize: 14, color: '#374151', fontWeight: '500' },
-  typeChipTextSelected: { color: '#fff', fontWeight: '700' },
-  submitBtn: { backgroundColor: '#1e40af', borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
-  submitBtnText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  typeChip: { flex: 1, borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 8, paddingVertical: 10, alignItems: 'center', backgroundColor: '#fff' },
+  typeChipSelected: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  typeChipText: { fontSize: 14, fontFamily: 'PublicSans_500Medium', color: '#36425A' },
+  typeChipTextSelected: { color: '#fff', fontFamily: 'Manrope_700Bold' },
+  submitBtn: {
+    backgroundColor: '#1E73CE', borderRadius: 9, height: 46, alignItems: 'center', justifyContent: 'center', marginTop: 24,
+    shadowColor: '#1E73CE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.28, shadowRadius: 16, elevation: 5,
+  },
+  submitBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 16 },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20, maxHeight: '70%' },
-  sheetTitle: { fontSize: 16, fontWeight: '700', color: '#111827', marginBottom: 12 },
-  sheetRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  sheetRowText: { fontSize: 15, color: '#111827', fontWeight: '500' },
-  sheetRowSub: { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  sheetTitle: { fontSize: 16, fontFamily: 'Manrope_700Bold', color: '#17233D', marginBottom: 12 },
+  sheetRow: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F4F7FB' },
+  sheetRowText: { fontSize: 15, fontFamily: 'PublicSans_500Medium', color: '#17233D' },
+  sheetRowSub: { fontSize: 12, fontFamily: 'PublicSans_400Regular', color: '#64728A', marginTop: 2 },
   sheetCancel: { paddingVertical: 14, alignItems: 'center', marginTop: 8 },
 });

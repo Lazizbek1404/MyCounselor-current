@@ -23,6 +23,14 @@ type Filter = 'All' | 'Pending Approval' | 'Approved';
 
 const FILTERS: Filter[] = ['All', 'Pending Approval', 'Approved'];
 
+// ── Avatar helper ──────────────────────────────────────────────────────────────
+
+const AVATAR_PALETTE = ['#2C7FD6','#199FB0','#E0785A','#7C6CD6','#27A869','#E2A437','#5C6B82'];
+function getAvatarBg(name: string) {
+  let h = 0; for (let i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))>>>0;
+  return AVATAR_PALETTE[h % AVATAR_PALETTE.length];
+}
+
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
 export default function CounselorStudentsScreen() {
@@ -105,7 +113,7 @@ export default function CounselorStudentsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -149,14 +157,17 @@ export default function CounselorStudentsScreen() {
         }
         renderItem={({ item }) => (
           <TouchableOpacity style={s.card} onPress={() => setSelected(item)}>
-            <View style={s.avatar}>
+            <View style={[s.avatar, { backgroundColor: getAvatarBg(`${item.firstName} ${item.lastName}`) }]}>
               <Text style={s.avatarText}>{item.firstName[0]}{item.lastName[0]}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <View style={s.cardTop}>
                 <Text style={s.cardName}>{item.firstName} {item.lastName}</Text>
                 <View style={[s.badge, item.approved ? s.badgeApproved : s.badgePending]}>
-                  <Text style={s.badgeText}>{item.approved ? 'Approved' : 'Pending'}</Text>
+                  <View style={[s.badgeDot, { backgroundColor: item.approved ? '#27A869' : '#E2A437' }]} />
+                  <Text style={[s.badgeText, { color: item.approved ? '#1B8A54' : '#9A6A12' }]}>
+                    {item.approved ? 'Approved' : 'Pending'}
+                  </Text>
                 </View>
               </View>
               <Text style={s.cardMeta}>{item.email}</Text>
@@ -183,15 +194,22 @@ export default function CounselorStudentsScreen() {
 
             <ScrollView contentContainerStyle={s.modalBody}>
               {/* Avatar */}
-              <View style={s.detailAvatar}>
+              <View style={[s.detailAvatar, { backgroundColor: getAvatarBg(`${selected.firstName} ${selected.lastName}`) }]}>
                 <Text style={s.detailAvatarText}>
                   {selected.firstName[0]}{selected.lastName[0]}
                 </Text>
               </View>
 
               <Text style={s.detailName}>{selected.firstName} {selected.lastName}</Text>
-              <View style={[s.badge, selected.approved ? s.badgeApproved : s.badgePending, { alignSelf: 'center', marginBottom: 20 }]}>
-                <Text style={s.badgeText}>{selected.approved ? 'Approved' : 'Pending Approval'}</Text>
+              <View style={[
+                s.badge,
+                selected.approved ? s.badgeApproved : s.badgePending,
+                { alignSelf: 'center', marginBottom: 20 },
+              ]}>
+                <View style={[s.badgeDot, { backgroundColor: selected.approved ? '#27A869' : '#E2A437' }]} />
+                <Text style={[s.badgeText, { color: selected.approved ? '#1B8A54' : '#9A6A12' }]}>
+                  {selected.approved ? 'Approved' : 'Pending Approval'}
+                </Text>
               </View>
 
               <View style={s.infoRow}>
@@ -239,46 +257,56 @@ export default function CounselorStudentsScreen() {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { fontSize: 13, color: '#6b7280', textAlign: 'center' },
+  muted: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A', textAlign: 'center' },
   // Header
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  headerCount: { fontSize: 13, color: '#6b7280' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  headerCount: { fontSize: 13, fontFamily: 'PublicSans_400Regular', color: '#64728A' },
   // Filters
-  filtersRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  filterChip: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#fff' },
-  filterChipActive: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  filterChipText: { fontSize: 13, color: '#374151', fontWeight: '500' },
-  filterChipTextActive: { color: '#fff', fontWeight: '700' },
+  filtersRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  filterChip: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#fff' },
+  filterChipActive: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  filterChipText: { fontSize: 13, fontFamily: 'PublicSans_500Medium', color: '#36425A' },
+  filterChipTextActive: { color: '#fff', fontFamily: 'Manrope_700Bold' },
   // Cards
-  card: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#e5e7eb' },
-  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  card: {
+    flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff',
+    borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#E6EBF2',
+    shadowColor: '#142850', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 2, elevation: 1,
+  },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  avatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 15 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 2 },
-  cardName: { fontSize: 14, fontWeight: '600', color: '#111827', flex: 1 },
-  cardMeta: { fontSize: 12, color: '#6b7280' },
+  cardName: { fontSize: 14, fontFamily: 'PublicSans_600SemiBold', color: '#17233D', flex: 1 },
+  cardMeta: { fontSize: 12, fontFamily: 'PublicSans_400Regular', color: '#64728A' },
   // Badges
-  badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeApproved: { backgroundColor: '#dcfce7' },
-  badgePending: { backgroundColor: '#fef3c7' },
-  badgeText: { fontSize: 11, fontWeight: '700', color: '#111827' },
+  badge: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', borderRadius: 999, paddingVertical: 5, paddingHorizontal: 11, gap: 5 },
+  badgeDot: { width: 7, height: 7, borderRadius: 4 },
+  badgeApproved: { backgroundColor: '#DCF1E6' },
+  badgePending: { backgroundColor: '#FBEFD6' },
+  badgeText: { fontFamily: 'PublicSans_700Bold', fontSize: 12, textTransform: 'capitalize' },
   // Modal
-  modalContainer: { flex: 1, backgroundColor: '#f9fafb' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  closeText: { fontSize: 15, color: '#1e40af' },
+  modalContainer: { flex: 1, backgroundColor: '#F4F7FB' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  modalTitle: { fontSize: 17, fontFamily: 'Manrope_700Bold', color: '#17233D' },
+  closeText: { fontSize: 15, fontFamily: 'PublicSans_600SemiBold', color: '#1E73CE' },
   modalBody: { padding: 24, alignItems: 'stretch' },
-  detailAvatar: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#1e40af', alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 12 },
-  detailAvatarText: { color: '#fff', fontWeight: '700', fontSize: 24 },
-  detailName: { fontSize: 20, fontWeight: '700', color: '#111827', textAlign: 'center', marginBottom: 8 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  infoLabel: { fontSize: 13, color: '#6b7280', fontWeight: '500' },
-  infoValue: { fontSize: 13, color: '#111827', fontWeight: '600', flexShrink: 1, textAlign: 'right' },
+  detailAvatar: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', alignSelf: 'center', marginBottom: 12 },
+  detailAvatarText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 24 },
+  detailName: { fontSize: 20, fontFamily: 'Manrope_700Bold', color: '#17233D', textAlign: 'center', marginBottom: 8 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F4F7FB' },
+  infoLabel: { fontSize: 13, fontFamily: 'PublicSans_500Medium', color: '#64728A' },
+  infoValue: { fontSize: 13, fontFamily: 'PublicSans_600SemiBold', color: '#17233D', flexShrink: 1, textAlign: 'right' },
   actionRow: { flexDirection: 'row', gap: 12, marginTop: 28 },
-  actionBtn: { flex: 1, borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
-  actionBtnApprove: { backgroundColor: '#22c55e' },
-  actionBtnReject: { backgroundColor: '#ef4444' },
-  actionBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  actionBtn: { flex: 1, borderRadius: 9, height: 46, alignItems: 'center', justifyContent: 'center' },
+  actionBtnApprove: {
+    backgroundColor: '#27A869',
+  },
+  actionBtnReject: {
+    backgroundColor: '#E5483B',
+    shadowColor: '#E5483B', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.24, shadowRadius: 16, elevation: 5,
+  },
+  actionBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 15 },
 });

@@ -25,10 +25,10 @@ interface Resource {
 const CATEGORIES = ['All', 'College', 'Career', 'Academic', 'Wellness'];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  college: '#8b5cf6',
-  career: '#f59e0b',
-  academic: '#3b82f6',
-  wellness: '#22c55e',
+  college: '#7C6CD6',
+  career:  '#E2A437',
+  academic: '#2C7FD6',
+  wellness: '#27A869',
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ export default function StudentGuidanceScreen() {
   if (loading) {
     return (
       <SafeAreaView style={s.center}>
-        <ActivityIndicator size="large" color="#1e40af" />
+        <ActivityIndicator size="large" color="#1E73CE" />
       </SafeAreaView>
     );
   }
@@ -120,7 +120,7 @@ export default function StudentGuidanceScreen() {
           </View>
         }
         renderItem={({ item }) => {
-          const catColor = CATEGORY_COLORS[item.category?.toLowerCase()] ?? '#6b7280';
+          const catColor = CATEGORY_COLORS[item.category?.toLowerCase()] ?? '#64728A';
           return (
             <View style={s.card}>
               <View style={s.cardTop}>
@@ -151,26 +151,38 @@ export default function StudentGuidanceScreen() {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
-  muted: { fontSize: 13, color: '#6b7280', textAlign: 'center' },
+  muted: { fontSize: 13, color: '#64728A', textAlign: 'center', fontFamily: 'PublicSans_500Medium' },
   // Header
-  header: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
+  header: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, color: '#17233D', fontFamily: 'Manrope_700Bold' },
   // Filters
-  filtersRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  filterChip: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6, backgroundColor: '#fff' },
-  filterChipActive: { backgroundColor: '#1e40af', borderColor: '#1e40af' },
-  filterChipText: { fontSize: 13, color: '#374151', fontWeight: '500' },
-  filterChipTextActive: { color: '#fff', fontWeight: '700' },
+  filtersRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  filterChip: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6, backgroundColor: '#fff' },
+  filterChipActive: { backgroundColor: '#1E73CE', borderColor: '#1E73CE' },
+  filterChipText: { fontSize: 13, color: '#36425A', fontFamily: 'PublicSans_500Medium' },
+  filterChipTextActive: { color: '#fff', fontFamily: 'Manrope_700Bold' },
   // Cards
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E6EBF2',
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
   cardTop: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   categoryBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3 },
-  categoryText: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  typeBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#f3f4f6' },
-  typeText: { fontSize: 11, color: '#6b7280', fontWeight: '500', textTransform: 'capitalize' },
-  cardTitle: { fontSize: 15, fontWeight: '600', color: '#111827', marginBottom: 4 },
-  cardDescription: { fontSize: 13, color: '#6b7280', lineHeight: 19, marginBottom: 8 },
-  cardDate: { fontSize: 12, color: '#9ca3af' },
+  categoryText: { fontSize: 11, fontFamily: 'PublicSans_700Bold', textTransform: 'uppercase', letterSpacing: 0.5 },
+  typeBadge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: '#F4F7FB' },
+  typeText: { fontSize: 11, color: '#64728A', fontFamily: 'PublicSans_500Medium', textTransform: 'capitalize' },
+  cardTitle: { fontSize: 15, color: '#17233D', marginBottom: 4, fontFamily: 'Manrope_700Bold' },
+  cardDescription: { fontSize: 13, color: '#64728A', lineHeight: 19, marginBottom: 8, fontFamily: 'PublicSans_400Regular' },
+  cardDate: { fontSize: 12, color: '#95A2B6', fontFamily: 'PublicSans_500Medium' },
 });

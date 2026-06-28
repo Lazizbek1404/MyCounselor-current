@@ -44,18 +44,18 @@ function statusLabel(s: RequestStatus) {
   return s === 'in_progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function statusColor(s: RequestStatus) {
-  switch (s) {
-    case 'pending': return '#f59e0b';
-    case 'in_progress': return '#3b82f6';
-    case 'approved': return '#22c55e';
-    case 'closed': return '#6b7280';
-  }
-}
-
 function fmtDate(v: string) {
   return new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
+
+// ── Status badge config ────────────────────────────────────────────────────────
+
+const STATUS_BADGE: Record<RequestStatus, { bg: string; text: string; dot: string }> = {
+  pending:     { bg: '#FBEFD6', text: '#9A6A12', dot: '#E2A437' },
+  in_progress: { bg: '#E2EEFB', text: '#1A63B8', dot: '#2C7FD6' },
+  approved:    { bg: '#DCF1E6', text: '#1B8A54', dot: '#27A869' },
+  closed:      { bg: '#EAEEF4', text: '#5C6B82', dot: '#94A3B8' },
+};
 
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
@@ -168,7 +168,7 @@ export default function StudentRequestsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={s.center}><ActivityIndicator size="large" color="#1e40af" /></SafeAreaView>
+      <SafeAreaView style={s.center}><ActivityIndicator size="large" color="#1E73CE" /></SafeAreaView>
     );
   }
 
@@ -193,29 +193,33 @@ export default function StudentRequestsScreen() {
             <Text style={s.muted}>Tap "+ New" to create your first counseling request.</Text>
           </View>
         ) : (
-          requests.map(r => (
-            <View key={r.id} style={s.card}>
-              <View style={s.cardRow}>
-                <Text style={[s.cardTitle, { flex: 1 }]}>{r.title}</Text>
-                <View style={[s.badge, { backgroundColor: statusColor(r.status) }]}>
-                  <Text style={s.badgeText}>{statusLabel(r.status)}</Text>
+          requests.map(r => {
+            const badge = STATUS_BADGE[r.status];
+            return (
+              <View key={r.id} style={s.card}>
+                <View style={s.cardRow}>
+                  <Text style={[s.cardTitle, { flex: 1 }]}>{r.title}</Text>
+                  <View style={[s.statusBadge, { backgroundColor: badge.bg }]}>
+                    <View style={[s.statusDot, { backgroundColor: badge.dot }]} />
+                    <Text style={[s.statusBadgeText, { color: badge.text }]}>{statusLabel(r.status)}</Text>
+                  </View>
                 </View>
-              </View>
-              <Text style={s.muted}>{r.counselor} · {r.createdAt}</Text>
-              <View style={s.chipRow}>
-                <View style={s.chip}><Text style={s.chipText}>{r.category}</Text></View>
-              </View>
-              {r.description ? (
-                <Text style={[s.muted, { marginTop: 6 }]} numberOfLines={2}>{r.description}</Text>
-              ) : null}
-              {r.response ? (
-                <View style={s.responseBox}>
-                  <Text style={s.responseLabel}>Counselor Response</Text>
-                  <Text style={s.muted}>{r.response}</Text>
+                <Text style={s.muted}>{r.counselor} · {r.createdAt}</Text>
+                <View style={s.chipRow}>
+                  <View style={s.chip}><Text style={s.chipText}>{r.category}</Text></View>
                 </View>
-              ) : null}
-            </View>
-          ))
+                {r.description ? (
+                  <Text style={[s.muted, { marginTop: 6 }]} numberOfLines={2}>{r.description}</Text>
+                ) : null}
+                {r.response ? (
+                  <View style={s.responseBox}>
+                    <Text style={s.responseLabel}>Counselor Response</Text>
+                    <Text style={s.muted}>{r.response}</Text>
+                  </View>
+                ) : null}
+              </View>
+            );
+          })
         )}
       </ScrollView>
 
@@ -238,7 +242,7 @@ export default function StudentRequestsScreen() {
                 value={form.title}
                 onChangeText={v => setField('title', v)}
                 placeholder="Brief description of your request"
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor="#95A2B6"
               />
               {formErrors.title ? <Text style={s.errorText}>{formErrors.title}</Text> : null}
 
@@ -249,7 +253,7 @@ export default function StudentRequestsScreen() {
                 value={form.description}
                 onChangeText={v => setField('description', v)}
                 placeholder="Describe what you need help with..."
-                placeholderTextColor="#9ca3af"
+                placeholderTextColor="#95A2B6"
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -346,51 +350,72 @@ export default function StudentRequestsScreen() {
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  addBtn: { backgroundColor: '#1e40af', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 7 },
-  addBtnText: { color: '#fff', fontWeight: '600', fontSize: 14 },
+  container: { flex: 1, backgroundColor: '#F4F7FB' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F4F7FB' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  headerTitle: { fontSize: 18, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  addBtn: { backgroundColor: '#1E73CE', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 7 },
+  addBtnText: { color: '#fff', fontFamily: 'Manrope_700Bold', fontSize: 14 },
   scroll: { padding: 16, paddingBottom: 40 },
   empty: { alignItems: 'center', paddingVertical: 40 },
-  emptyTitle: { fontSize: 16, fontWeight: '600', color: '#374151', marginBottom: 6 },
-  muted: { fontSize: 13, color: '#6b7280' },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: '#e5e7eb' },
+  emptyTitle: { fontSize: 16, color: '#36425A', marginBottom: 6, fontFamily: 'Manrope_700Bold' },
+  muted: { fontSize: 13, color: '#64728A', fontFamily: 'PublicSans_500Medium' },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#E6EBF2',
+    shadowColor: '#142850',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
   cardRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 },
-  cardTitle: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  badge: { borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeText: { fontSize: 11, color: '#fff', fontWeight: '600' },
+  cardTitle: { fontSize: 14, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingVertical: 5,
+    paddingHorizontal: 11,
+    gap: 5,
+  },
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusBadgeText: { fontFamily: 'PublicSans_700Bold', fontSize: 12 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6 },
-  chip: { backgroundColor: '#f3f4f6', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
-  chipText: { fontSize: 11, color: '#374151', fontWeight: '500' },
+  chip: { backgroundColor: '#F4F7FB', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
+  chipText: { fontSize: 11, color: '#36425A', fontFamily: 'PublicSans_500Medium' },
   responseBox: { marginTop: 8, padding: 10, backgroundColor: '#f0fdf4', borderRadius: 8, borderWidth: 1, borderColor: '#bbf7d0' },
-  responseLabel: { fontSize: 12, fontWeight: '700', color: '#166534', marginBottom: 4 },
+  responseLabel: { fontSize: 12, color: '#166534', marginBottom: 4, fontFamily: 'Manrope_700Bold' },
   // Modal
   modalContainer: { flex: 1, backgroundColor: '#fff' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle: { fontSize: 17, fontWeight: '700', color: '#111827' },
-  cancelText: { fontSize: 15, color: '#1e40af' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E6EBF2' },
+  modalTitle: { fontSize: 17, color: '#17233D', fontFamily: 'Manrope_700Bold' },
+  cancelText: { fontSize: 15, color: '#1E73CE', fontFamily: 'PublicSans_600SemiBold' },
   modalScroll: { padding: 16, paddingBottom: 40 },
-  label: { fontSize: 14, fontWeight: '600', color: '#374151', marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, color: '#111827', backgroundColor: '#f9fafb' },
+  label: { fontSize: 14, color: '#36425A', marginBottom: 6, fontFamily: 'Manrope_700Bold' },
+  input: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 12, fontSize: 15, color: '#17233D', backgroundColor: '#F4F7FB', fontFamily: 'PublicSans_400Regular' },
   textarea: { minHeight: 100 },
-  inputError: { borderColor: '#ef4444' },
-  errorText: { fontSize: 12, color: '#ef4444', marginTop: 3 },
+  inputError: { borderColor: '#E5483B' },
+  errorText: { fontSize: 12, color: '#E5483B', marginTop: 3, fontFamily: 'PublicSans_500Medium' },
   optionWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  optionChip: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: '#f9fafb' },
-  optionChipActive: { borderColor: '#1e40af', backgroundColor: '#eff6ff' },
-  optionChipText: { fontSize: 13, color: '#374151', fontWeight: '500' },
-  optionChipTextActive: { color: '#1e40af', fontWeight: '600' },
-  pickerBtn: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 13, backgroundColor: '#f9fafb' },
-  pickerValue: { fontSize: 15, color: '#111827' },
-  pickerPlaceholder: { fontSize: 15, color: '#9ca3af' },
-  submitBtn: { backgroundColor: '#1e40af', borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  optionChip: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: '#F4F7FB' },
+  optionChipActive: { borderColor: '#1E73CE', backgroundColor: '#E2EEFB' },
+  optionChipText: { fontSize: 13, color: '#36425A', fontFamily: 'PublicSans_500Medium' },
+  optionChipTextActive: { color: '#1E73CE', fontFamily: 'PublicSans_600SemiBold' },
+  pickerBtn: { borderWidth: 1, borderColor: '#E6EBF2', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 13, backgroundColor: '#F4F7FB' },
+  pickerValue: { fontSize: 15, color: '#17233D', fontFamily: 'PublicSans_400Regular' },
+  pickerPlaceholder: { fontSize: 15, color: '#95A2B6', fontFamily: 'PublicSans_400Regular' },
+  submitBtn: { backgroundColor: '#1E73CE', borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   submitBtnDisabled: { opacity: 0.6 },
-  submitBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  submitBtnText: { color: '#fff', fontSize: 16, fontFamily: 'Manrope_700Bold' },
   // Counselor picker
   pickerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   pickerSheet: { backgroundColor: '#fff', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '60%' },
-  pickerItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  pickerItemName: { fontSize: 15, fontWeight: '500', color: '#111827' },
+  pickerItem: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#F4F7FB' },
+  pickerItemName: { fontSize: 15, color: '#17233D', fontFamily: 'PublicSans_500Medium' },
 });
